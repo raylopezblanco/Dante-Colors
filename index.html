@@ -20,13 +20,13 @@
       height: 100%;
       overflow: hidden;
       touch-action: manipulation;
-      background: linear-gradient(160deg, #eef7ff 0%, #fff6e8 100%);
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(160deg, #dceeff 0%, #fff3df 100%);
+      font-family: 'Comic Sans MS', 'Bubblegum Sans', system-ui, -apple-system, sans-serif;
       color: #1e293b;
       position: relative;
     }
 
-    /* Capa de fondo con capibara suave y bordes difuminados */
+    /* Capa de fondo con capibara suave abajo sin tapar con el Good Job */
     .bg-capybara {
       position: fixed;
       inset: 0;
@@ -35,17 +35,17 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      padding-bottom: 14px;
-      opacity: 0.24;
+      padding-bottom: 16px;
+      opacity: 0.25;
     }
 
     .bg-capybara img {
-      width: min(360px, 82vw);
+      width: min(360px, 84vw);
       height: auto;
-      max-height: 210px;
+      max-height: 215px;
       object-fit: cover;
       border-radius: 28px;
-      filter: saturate(0.9);
+      filter: saturate(0.92);
       -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, #000 52%, transparent 100%);
       mask-image: radial-gradient(ellipse 78% 72% at 50% 50%, #000 52%, transparent 100%);
     }
@@ -62,7 +62,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 18px 26px;
+      padding: 16px 18px 24px;
       position: relative;
       z-index: 1;
     }
@@ -76,6 +76,7 @@
       background: rgba(255, 255, 255, 0.78);
       border: 1px solid rgba(15, 23, 42, 0.12);
       color: #475569;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 0.78rem;
       font-weight: 600;
       padding: 7px 12px;
@@ -90,23 +91,48 @@
       border-color: #93c5fd;
     }
 
-    .header-space {
-      height: 28px;
+    /* Zona superior: dinosaurio flotante + Good Job arriba de la imagen */
+    .top-celebration-area {
+      width: 100%;
+      max-width: 440px;
+      min-height: 112px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 6px;
+      padding-top: 4px;
     }
 
-    .category-badge {
-      font-size: 0.9rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 5px 14px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.88);
-      color: #334155;
-      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    .dino-mascot {
+      font-size: 2.6rem;
+      line-height: 1;
+      animation: flotarDino 2.2s ease-in-out infinite;
+      filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.12));
+    }
+
+    @keyframes flotarDino {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .praise-text {
+      font-size: clamp(1.45rem, 5.6vw, 2.05rem);
+      font-weight: 800;
+      color: #15803d;
+      background: rgba(220, 252, 231, 0.96);
+      border: 3px solid #86efac;
+      padding: 7px 20px;
+      border-radius: 22px;
+      opacity: 0;
+      transform: translateY(-8px) scale(0.9);
+      transition: opacity 0.28s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 8px 20px rgba(21, 128, 61, 0.14);
+    }
+
+    .praise-text.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
     /* Recuadro principal gigante y seguro */
@@ -114,17 +140,17 @@
       width: 100%;
       max-width: 440px;
       flex: 1;
-      max-height: 520px;
-      margin: 10px 0;
+      max-height: 470px;
+      margin: 8px 0 12px;
       background: rgba(255, 255, 255, 0.96);
       border-radius: 36px;
-      border: 6px solid #ffffff;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+      border: 7px solid #ffffff;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.13);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 22px;
+      padding: 20px;
       cursor: pointer;
       transition: transform 0.14s ease, border-color 0.25s ease, box-shadow 0.25s ease;
       position: relative;
@@ -137,15 +163,15 @@
 
     .visual-frame {
       width: 100%;
-      max-width: 280px;
-      height: 240px;
+      max-width: 270px;
+      height: 225px;
       border-radius: 26px;
       background: #f8fafc;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       position: relative;
     }
 
@@ -157,7 +183,7 @@
     }
 
     .visual-frame .fallback-emoji {
-      font-size: 6.2rem;
+      font-size: 6rem;
       line-height: 1;
     }
 
@@ -176,32 +202,11 @@
       color: #64748b;
     }
 
-    /* Celebración calmada pero alegre */
-    .praise-box {
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    /* Espacio libre abajo para que el capibara se vea sin estorbar */
+    .bottom-space {
+      height: 44px;
       width: 100%;
-    }
-
-    .praise-text {
-      font-size: clamp(1.6rem, 6vw, 2.25rem);
-      font-weight: 800;
-      color: #15803d;
-      background: #dcfce7;
-      border: 2px solid #86efac;
-      padding: 10px 24px;
-      border-radius: 24px;
-      opacity: 0;
-      transform: translateY(10px) scale(0.92);
-      transition: opacity 0.28s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-      box-shadow: 0 8px 20px rgba(21, 128, 61, 0.12);
-    }
-
-    .praise-text.visible {
-      opacity: 1;
-      transform: translateY(0) scale(1);
+      pointer-events: none;
     }
 
     /* Panel de cuidado (oculto por defecto) */
@@ -214,6 +219,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      font-family: system-ui, -apple-system, sans-serif;
     }
 
     .care-modal.open {
@@ -288,10 +294,13 @@
       Ajustes (mantén)
     </button>
 
-    <div class="header-space">
-      <span id="categoryBadge" class="category-badge">Dante-Colors</span>
+    <!-- Dinosaurio amigable + Good Job arriba del recuadro -->
+    <div class="top-celebration-area">
+      <div id="dinoMascot" class="dino-mascot" aria-hidden="true">🦖</div>
+      <div id="praiseText" class="praise-text">Good Job, Dante! 🌟</div>
     </div>
 
+    <!-- Recuadro principal gigante -->
     <div id="stage" class="stage" role="button" tabindex="0" aria-label="Tarjeta interactiva">
       <div id="visualFrame" class="visual-frame">
         <span id="fallbackEmoji" class="fallback-emoji">🌟</span>
@@ -301,9 +310,7 @@
       <div id="subLabel" class="sub-label">Toca para empezar</div>
     </div>
 
-    <div class="praise-box">
-      <div id="praiseText" class="praise-text">Good Job, Dante!</div>
-    </div>
+    <div class="bottom-space" aria-hidden="true"></div>
   </div>
 
   <!-- Panel discreto de ajustes para adultos -->
@@ -320,8 +327,8 @@
       </div>
 
       <div class="care-row">
-        <label for="praiseDelay">Pausa Good Job: <strong id="delayValue">0.8s</strong></label>
-        <input id="praiseDelay" type="range" min="300" max="2000" step="100" value="800" />
+        <label for="praiseDelay">Delay Good Job: <strong id="delayValue">0.9s</strong></label>
+        <input id="praiseDelay" type="range" min="300" max="2500" step="100" value="900" />
       </div>
 
       <div class="care-actions">
@@ -336,61 +343,55 @@
 
     const ITEMS = [
       {
-        id: 'mom',
-        category: 'Familia',
-        word: 'Mom',
-        hint: 'Mamá',
-        accent: '#ec4899',
-        emoji: '👩',
-        image: 'mom.jpg',
-        audio: 'mom.mp3'
+        id: 'red',
+        word: 'Red',
+        hint: 'Rojo',
+        accent: '#ff7675',
+        emoji: '🔴',
+        image: 'red.jpg',
+        audio: 'red.mp3'
       },
       {
-        id: 'dad',
-        category: 'Familia',
-        word: 'Dad',
-        hint: 'Papá',
-        accent: '#2563eb',
-        emoji: '👨',
-        image: 'dad.jpg',
-        audio: 'dad.mp3'
+        id: 'blue',
+        word: 'Blue',
+        hint: 'Azul',
+        accent: '#74b9ff',
+        emoji: '🔵',
+        image: 'blue.jpg',
+        audio: 'blue.mp3'
       },
       {
-        id: 'dante',
-        category: 'Familia',
-        word: 'Dante',
-        hint: 'Dante',
-        accent: '#16a34a',
-        emoji: '👦',
-        image: 'dante.jpg',
-        audio: 'dante.mp3'
+        id: 'green',
+        word: 'Green',
+        hint: 'Verde',
+        accent: '#55efc4',
+        emoji: '🟢',
+        image: 'green.jpg',
+        audio: 'green.mp3'
       },
       {
-        id: 'dog',
-        category: 'Mascotas',
-        word: 'Dog',
-        hint: 'Perrito',
-        accent: '#d97706',
-        emoji: '🐶',
-        image: 'dog.jpg',
-        audio: 'dog.mp3'
+        id: 'yellow',
+        word: 'Yellow',
+        hint: 'Amarillo',
+        accent: '#ffeaa7',
+        emoji: '🟡',
+        image: 'yellow.jpg',
+        audio: 'yellow.mp3'
       },
       {
         id: 'ball',
-        category: 'Objetos',
         word: 'Ball',
         hint: 'Pelota',
-        accent: '#ea580c',
+        accent: '#fab1a0',
         emoji: '⚽',
         image: 'ball.jpg',
         audio: 'ball.mp3'
       },
       {
         id: 'water',
-        category: 'Objetos',
         word: 'Water',
         hint: 'Agua',
-        accent: '#0284c7',
+        accent: '#81ecec',
         emoji: '💧',
         image: 'water.jpg',
         audio: 'water.mp3'
@@ -407,14 +408,14 @@
     const bgCapybaraImg = document.getElementById('bgCapybaraImg');
     const bgCapybaraFallback = document.getElementById('bgCapybaraFallback');
 
+    const dinoMascot = document.getElementById('dinoMascot');
+    const praiseText = document.getElementById('praiseText');
     const stage = document.getElementById('stage');
-    const categoryBadge = document.getElementById('categoryBadge');
     const visualFrame = document.getElementById('visualFrame');
     const itemImage = document.getElementById('itemImage');
     const fallbackEmoji = document.getElementById('fallbackEmoji');
     const wordLabel = document.getElementById('wordLabel');
     const subLabel = document.getElementById('subLabel');
-    const praiseText = document.getElementById('praiseText');
 
     const careTrigger = document.getElementById('careTrigger');
     const careModal = document.getElementById('careModal');
@@ -483,8 +484,9 @@
     }
 
     function playGentleChime() {
-      playSoftTone(523.25, 0.22, 'triangle', 0);
-      playSoftTone(659.25, 0.28, 'triangle', 0.14);
+      playSoftTone(523.25, 0.2, 'triangle', 0);
+      playSoftTone(659.25, 0.22, 'triangle', 0.14);
+      playSoftTone(783.99, 0.3, 'triangle', 0.28);
     }
 
     function playAudioOrFallback(src, fallbackFn, onEndedCallback) {
@@ -535,11 +537,10 @@
     }
 
     function renderItem(item) {
-      categoryBadge.textContent = item.category;
       wordLabel.textContent = item.word;
       subLabel.textContent = item.hint;
       stage.style.borderColor = item.accent;
-      visualFrame.style.background = `${item.accent}14`;
+      visualFrame.style.background = `${item.accent}26`;
 
       fallbackEmoji.textContent = item.emoji;
       fallbackEmoji.style.display = 'block';
@@ -566,6 +567,11 @@
       void praiseText.offsetWidth;
       praiseText.classList.add('visible');
 
+      dinoMascot.style.transform = 'scale(1.15)';
+      setTimeout(() => {
+        dinoMascot.style.transform = '';
+      }, 320);
+
       playAudioOrFallback(GOOD_JOB_AUDIO, playGentleChime);
     }
 
@@ -579,9 +585,9 @@
       const item = ITEMS[currentIndex];
       renderItem(item);
 
-      playSoftTone(440, 0.12, 'sine', 0);
+      playSoftTone(440, 0.14, 'sine', 0);
 
-      const delayMs = Number(praiseDelayInput.value) || 800;
+      const delayMs = Number(praiseDelayInput.value) || 900;
 
       playAudioOrFallback(
         item.audio,
