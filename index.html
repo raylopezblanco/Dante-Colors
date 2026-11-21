@@ -33,6 +33,7 @@
       position: relative;
     }
 
+    /* Capa de fondo con capibara suave abajo sin tapar con el Good Job */
     .bg-capybara {
       position: fixed;
       inset: 0;
@@ -41,14 +42,14 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       opacity: 0.24;
     }
 
     .bg-capybara img {
-      width: min(350px, 80vw);
+      width: min(360px, 84vw);
       height: auto;
-      max-height: 190px;
+      max-height: 185px;
       object-fit: cover;
       border-radius: 28px;
       filter: saturate(0.95);
@@ -57,7 +58,7 @@
     }
 
     .bg-capybara-fallback {
-      font-size: clamp(5.5rem, 20vw, 8.5rem);
+      font-size: clamp(5rem, 18vw, 8rem);
       line-height: 1;
     }
 
@@ -68,23 +69,24 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 18px 22px;
+      padding: 46px 14px 16px;
       position: relative;
       z-index: 1;
     }
 
+    /* Botón discreto de cuidado (requiere mantener presionado) */
     .care-trigger {
       position: fixed;
-      top: 12px;
-      right: 12px;
+      top: 10px;
+      right: 10px;
       z-index: 20;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       border: 1px solid rgba(15, 23, 42, 0.14);
       color: #2d3436;
       font-family: system-ui, -apple-system, sans-serif;
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      padding: 7px 12px;
+      padding: 6px 11px;
       border-radius: 999px;
       cursor: pointer;
       backdrop-filter: blur(6px);
@@ -96,52 +98,60 @@
       border-color: #fdcb6e;
     }
 
+    /* Encabezado compacto arriba + Good Job antes del recuadro */
     .top-header {
       width: 100%;
-      max-width: 480px;
+      max-width: 540px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding-top: 8px;
-      min-height: 132px;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     h1 {
-      font-size: clamp(1.75rem, 5.5vw, 2.55rem);
+      font-size: clamp(1.35rem, 4.6vw, 2.25rem);
       color: #ffffff;
-      text-shadow: 3px 3px 0px #0984e3, 6px 6px 0px rgba(0, 0, 0, 0.18);
+      text-shadow: 2px 2px 0px #0984e3, 4px 4px 0px rgba(0, 0, 0, 0.18);
       text-align: center;
-      line-height: 1.15;
+      line-height: 1.1;
     }
 
     .dino-mascot {
-      font-size: clamp(2.4rem, 7vw, 3.3rem);
+      font-size: clamp(1.9rem, 5.5vw, 2.7rem);
       line-height: 1;
       animation: flotarDino 2.2s ease-in-out infinite;
-      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
+      filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.18));
       transition: transform 0.25s ease;
     }
 
     @keyframes flotarDino {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-6px); }
     }
 
     .praise-text {
-      font-size: clamp(1.35rem, 5vw, 1.95rem);
+      font-size: clamp(1.2rem, 4.5vw, 1.8rem);
       font-weight: 800;
       color: #ffeaa7;
-      background: rgba(9, 132, 227, 0.92);
+      background: rgba(9, 132, 227, 0.94);
       border: 3px solid #ffffff;
       text-shadow: 2px 2px 0px #d63031;
-      padding: 6px 20px;
-      border-radius: 22px;
+      padding: 5px 18px;
+      border-radius: 20px;
       opacity: 0;
-      transform: translateY(-6px) scale(0.9);
-      transition: opacity 0.28s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transform: translateY(-6px) scale(0.92);
+      transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
     }
 
     .praise-text.visible {
@@ -149,42 +159,43 @@
       transform: translateY(0) scale(1);
     }
 
+    /* Recuadro principal gigante que abarca lo más posible de la pantalla */
     .stage {
-      width: min(330px, 82vw);
-      height: min(330px, 44vh);
-      min-height: 240px;
+      width: min(94vw, 500px);
+      flex: 1;
+      max-height: 70vh;
+      min-height: 310px;
       background-color: #ff7675;
-      border-radius: 38px;
-      border: 8px solid #ffffff;
+      border-radius: 36px;
+      border: 7px solid #ffffff;
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 18px;
+      justify-content: space-between;
+      padding: 14px;
       cursor: pointer;
       transition: transform 0.12s ease, background-color 0.35s ease;
       position: relative;
       overflow: hidden;
-      margin: 6px 0;
+      margin: 8px 0 4px;
     }
 
     .stage:active {
-      transform: scale(0.93);
+      transform: scale(0.95);
     }
 
     .visual-frame {
       width: 100%;
-      max-width: 215px;
-      height: 165px;
-      border-radius: 24px;
+      flex: 1;
+      min-height: 190px;
+      border-radius: 26px;
       background: rgba(255, 255, 255, 0.24);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: 12px;
       position: relative;
     }
 
@@ -196,59 +207,47 @@
     }
 
     .visual-frame .fallback-emoji {
-      font-size: 4.8rem;
+      font-size: clamp(4.8rem, 15vw, 6.5rem);
       line-height: 1;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.18));
     }
 
     .img-status-note {
-      margin-top: 6px;
+      position: absolute;
+      bottom: 8px;
       font-family: system-ui, -apple-system, sans-serif;
       font-size: 0.72rem;
       font-weight: 700;
       color: #ffffff;
-      background: rgba(0, 0, 0, 0.28);
-      padding: 2px 8px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 3px 9px;
       border-radius: 999px;
       display: none;
     }
 
+    .text-group {
+      padding-top: 10px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
     .word-label {
-      font-size: clamp(1.9rem, 6.8vw, 2.65rem);
+      font-size: clamp(2rem, 7.2vw, 2.85rem);
       font-weight: 800;
       color: #ffffff;
-      line-height: 1.08;
-      text-align: center;
+      line-height: 1.05;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35);
     }
 
     .sub-label {
-      margin-top: 4px;
-      font-size: 0.98rem;
+      margin-top: 2px;
+      font-size: clamp(0.95rem, 3.6vw, 1.15rem);
       font-weight: 700;
       color: #ffffff;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    .bottom-bar {
-      min-height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .instruction-pill {
-      font-size: clamp(0.95rem, 3.6vw, 1.12rem);
-      font-weight: 700;
-      color: #2d3436;
-      background: rgba(255, 255, 255, 0.92);
-      padding: 8px 20px;
-      border-radius: 20px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-      text-align: center;
-    }
-
+    /* Panel de cuidado (oculto por defecto) */
     .care-modal {
       display: none;
       position: fixed;
@@ -335,8 +334,10 @@
     </button>
 
     <div class="top-header">
-      <h1>🎨 Let's Play with Colors! 🎨</h1>
-      <div id="dinoMascot" class="dino-mascot" aria-hidden="true">🦖</div>
+      <div class="title-row">
+        <h1>🎨 Let's Play with Colors! 🎨</h1>
+        <div id="dinoMascot" class="dino-mascot" aria-hidden="true">🦖</div>
+      </div>
       <div id="praiseText" class="praise-text">Good Job, Dante! 🌟</div>
     </div>
 
@@ -346,12 +347,10 @@
         <img id="itemImage" src="" alt="" style="display: none;" />
         <span id="imgStatusNote" class="img-status-note"></span>
       </div>
-      <div id="wordLabel" class="word-label">Touch me!</div>
-      <div id="subLabel" class="sub-label">Dante</div>
-    </div>
-
-    <div class="bottom-bar">
-      <div class="instruction-pill">¡Toca el cuadro para cambiar de color!</div>
+      <div class="text-group">
+        <div id="wordLabel" class="word-label">Touch me!</div>
+        <div id="subLabel" class="sub-label">Dante</div>
+      </div>
     </div>
   </div>
 
