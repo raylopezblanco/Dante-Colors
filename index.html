@@ -33,7 +33,6 @@
       position: relative;
     }
 
-    /* Capa de fondo con capibara suave abajo sin tapar con el Good Job */
     .bg-capybara {
       position: fixed;
       inset: 0;
@@ -74,7 +73,6 @@
       z-index: 1;
     }
 
-    /* Botón discreto de cuidado (requiere mantener presionado) */
     .care-trigger {
       position: fixed;
       top: 12px;
@@ -98,7 +96,6 @@
       border-color: #fdcb6e;
     }
 
-    /* Encabezado alegre + Good Job arriba del recuadro */
     .top-header {
       width: 100%;
       max-width: 480px;
@@ -152,7 +149,6 @@
       transform: translateY(0) scale(1);
     }
 
-    /* Recuadro principal gigante con estética alegre */
     .stage {
       width: min(330px, 82vw);
       height: min(330px, 44vh);
@@ -184,6 +180,7 @@
       border-radius: 24px;
       background: rgba(255, 255, 255, 0.24);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
@@ -204,6 +201,18 @@
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.18));
     }
 
+    .img-status-note {
+      margin-top: 6px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.28);
+      padding: 2px 8px;
+      border-radius: 999px;
+      display: none;
+    }
+
     .word-label {
       font-size: clamp(1.9rem, 6.8vw, 2.65rem);
       font-weight: 800;
@@ -221,7 +230,6 @@
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    /* Pastilla inferior amigable */
     .bottom-bar {
       min-height: 54px;
       display: flex;
@@ -241,7 +249,6 @@
       text-align: center;
     }
 
-    /* Panel de cuidado (oculto por defecto) */
     .care-modal {
       display: none;
       position: fixed;
@@ -281,6 +288,7 @@
       margin-bottom: 14px;
       font-size: 0.95rem;
       color: #334155;
+      gap: 10px;
     }
 
     .care-card select,
@@ -316,7 +324,6 @@
   </style>
 </head>
 <body>
-  <!-- Fondo de capibara: capybara.jpg en la raíz -->
   <div id="bgCapybara" class="bg-capybara" aria-hidden="true">
     <span id="bgCapybaraFallback" class="bg-capybara-fallback">🦫</span>
     <img id="bgCapybaraImg" src="" alt="" style="display: none;" />
@@ -337,6 +344,7 @@
       <div id="visualFrame" class="visual-frame">
         <span id="fallbackEmoji" class="fallback-emoji">🎨</span>
         <img id="itemImage" src="" alt="" style="display: none;" />
+        <span id="imgStatusNote" class="img-status-note"></span>
       </div>
       <div id="wordLabel" class="word-label">Touch me!</div>
       <div id="subLabel" class="sub-label">Dante</div>
@@ -347,22 +355,27 @@
     </div>
   </div>
 
-  <!-- Panel discreto de ajustes para adultos -->
   <div id="careModal" class="care-modal" aria-hidden="true">
     <div class="care-card">
       <h2>Ajustes de Dante-Colors</h2>
 
       <div class="care-row">
-        <label for="orderMode">Orden de tarjetas</label>
+        <label for="orderMode">Modo de avance</label>
         <select id="orderMode">
           <option value="sequential">En orden</option>
           <option value="random">Aleatorio</option>
+          <option value="repeat">Repetir actual</option>
         </select>
       </div>
 
       <div class="care-row">
         <label for="praiseDelay">Delay Good Job: <strong id="delayValue">0.9s</strong></label>
         <input id="praiseDelay" type="range" min="300" max="2500" step="100" value="900" />
+      </div>
+
+      <div class="care-row">
+        <label for="volumeSlider">Volumen: <strong id="volumeValue">80%</strong></label>
+        <input id="volumeSlider" type="range" min="0" max="100" step="10" value="80" />
       </div>
 
       <div class="care-actions">
@@ -374,6 +387,7 @@
 
   <script>
     const CAPYBARA_BG_IMAGE = 'capybara.jpg';
+    const COOLDOWN_MS = 450;
 
     const ITEMS = [
       {
@@ -384,6 +398,24 @@
         emoji: '👩',
         image: 'img-mama.jpeg',
         audio: 'mom.mp3'
+      },
+      {
+        id: 'lucas',
+        word: 'Lucas',
+        hint: 'Lucas',
+        color: '#74b9ff',
+        emoji: '🐶',
+        image: 'img-lucas.jpeg',
+        audio: 'lucas.mp3'
+      },
+      {
+        id: 'negrito',
+        word: 'Negrito',
+        hint: 'Negrito',
+        color: '#55efc4',
+        emoji: '🐕',
+        image: 'img-negrito.jpeg',
+        audio: 'negrito.mp3'
       },
       {
         id: 'red',
@@ -453,6 +485,7 @@
     const GOOD_JOB_AUDIO = 'goodjob.mp3';
 
     let currentIndex = -1;
+    let lastTapTime = 0;
     let praiseTimer = null;
     let currentAudio = null;
     let audioCtx = null;
@@ -466,6 +499,7 @@
     const visualFrame = document.getElementById('visualFrame');
     const itemImage = document.getElementById('itemImage');
     const fallbackEmoji = document.getElementById('fallbackEmoji');
+    const imgStatusNote = document.getElementById('imgStatusNote');
     const wordLabel = document.getElementById('wordLabel');
     const subLabel = document.getElementById('subLabel');
 
@@ -474,6 +508,8 @@
     const orderModeSelect = document.getElementById('orderMode');
     const praiseDelayInput = document.getElementById('praiseDelay');
     const delayValueLabel = document.getElementById('delayValue');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeValueLabel = document.getElementById('volumeValue');
     const testPraiseBtn = document.getElementById('testPraiseBtn');
     const closeCareBtn = document.getElementById('closeCareBtn');
 
@@ -513,6 +549,10 @@
       lastTouchEnd = now;
     }, { passive: false });
 
+    function getMasterVolume() {
+      return Math.max(0, Math.min(1, Number(volumeSlider.value) / 100));
+    }
+
     function ensureAudioContext() {
       if (!audioCtx) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -526,6 +566,9 @@
     }
 
     function playSoftTone(freq, duration = 0.18, type = 'sine', delay = 0) {
+      const vol = getMasterVolume();
+      if (vol <= 0) return;
+
       ensureAudioContext();
       if (!audioCtx) return;
 
@@ -536,8 +579,9 @@
       osc.type = type;
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.001, startTime);
-      gain.gain.linearRampToValueAtTime(0.12, startTime + 0.02);
+      const peakGain = 0.12 * vol;
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(peakGain, startTime + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
       osc.connect(gain);
@@ -565,13 +609,15 @@
         currentAudio.onerror = null;
       }
 
-      if (!src) {
-        if (fallbackFn) fallbackFn();
+      const vol = getMasterVolume();
+      if (!src || vol <= 0) {
+        if (fallbackFn && vol > 0) fallbackFn();
         if (onEndedCallback) setTimeout(onEndedCallback, 350);
         return;
       }
 
       const audio = new Audio(src);
+      audio.volume = vol;
       currentAudio = audio;
 
       let handledFallback = false;
@@ -593,7 +639,12 @@
     function pickNextIndex() {
       if (ITEMS.length === 1) return 0;
 
-      if (orderModeSelect.value === 'random') {
+      const mode = orderModeSelect.value;
+      if (mode === 'repeat') {
+        return currentIndex >= 0 ? currentIndex : 0;
+      }
+
+      if (mode === 'random') {
         let next = Math.floor(Math.random() * ITEMS.length);
         if (next === currentIndex) {
           next = (next + 1) % ITEMS.length;
@@ -612,6 +663,7 @@
       fallbackEmoji.textContent = item.emoji;
       fallbackEmoji.style.display = 'block';
       itemImage.style.display = 'none';
+      imgStatusNote.style.display = 'none';
 
       if (item.image) {
         const probe = new Image();
@@ -620,10 +672,13 @@
           itemImage.alt = item.word;
           itemImage.style.display = 'block';
           fallbackEmoji.style.display = 'none';
+          imgStatusNote.style.display = 'none';
         };
         probe.onerror = () => {
           itemImage.style.display = 'none';
           fallbackEmoji.style.display = 'block';
+          imgStatusNote.textContent = `Sin archivo: ${item.image}`;
+          imgStatusNote.style.display = 'inline-block';
         };
         probe.src = item.image;
       }
@@ -644,6 +699,10 @@
 
     function handleCardTap() {
       if (careModal.classList.contains('open')) return;
+
+      const now = Date.now();
+      if (now - lastTapTime < COOLDOWN_MS) return;
+      lastTapTime = now;
 
       clearTimeout(praiseTimer);
       praiseText.classList.remove('visible');
@@ -704,6 +763,13 @@
     praiseDelayInput.addEventListener('input', () => {
       const sec = (Number(praiseDelayInput.value) / 1000).toFixed(1);
       delayValueLabel.textContent = `${sec}s`;
+    });
+
+    volumeSlider.addEventListener('input', () => {
+      volumeValueLabel.textContent = `${volumeSlider.value}%`;
+      if (currentAudio) {
+        currentAudio.volume = getMasterVolume();
+      }
     });
 
     testPraiseBtn.addEventListener('click', () => {
