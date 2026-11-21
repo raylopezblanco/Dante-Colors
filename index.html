@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dante World</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: manipulation;
+      background: linear-gradient(160deg, #eef7ff 0%, #fff6e8 100%);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 18px 26px;
+      position: relative;
+    }
+
+    /* Botón discreto de cuidado (requiere mantener presionado) */
+    .care-trigger {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      color: #475569;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+
+    .care-trigger.holding {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-color: #93c5fd;
+    }
+
+    .header-space {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .category-badge {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      color: #334155;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    }
+
+    /* Recuadro principal gigante y seguro */
+    .stage {
+      width: 100%;
+      max-width: 440px;
+      flex: 1;
+      max-height: 520px;
+      margin: 10px 0;
+      background: #ffffff;
+      border-radius: 36px;
+      border: 6px solid #ffffff;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      cursor: pointer;
+      transition: transform 0.14s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stage:active {
+      transform: scale(0.965);
+    }
+
+    .visual-frame {
+      width: 100%;
+      max-width: 280px;
+      height: 240px;
+      border-radius: 26px;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .visual-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .visual-frame .fallback-emoji {
+      font-size: 6.2rem;
+      line-height: 1;
+    }
+
+    .word-label {
+      font-size: clamp(2.2rem, 8vw, 3.2rem);
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .sub-label {
+      margin-top: 6px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    /* Celebración calmada pero alegre */
+    .praise-box {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .praise-text {
+      font-size: clamp(1.6rem, 6vw, 2.25rem);
+      font-weight: 800;
+      color: #15803d;
+      background: #dcfce7;
+      border: 2px solid #86efac;
+      padding: 10px 24px;
+      border-radius: 24px;
+      opacity: 0;
+      transform: translateY(10px) scale(0.92);
+      transition: opacity 0.28s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 8px 20px rgba(21, 128, 61, 0.12);
+    }
+
+    .praise-text.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Panel de cuidado (oculto por defecto) */
+    .care-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.55);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .care-modal.open {
+      display: flex;
+    }
+
+    .care-card {
+      width: 100%;
+      max-width: 360px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+    }
+
+    .care-card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 14px;
+      color: #0f172a;
+    }
+
+    .care-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    .care-card select,
+    .care-card input[type="range"] {
+      accent-color: #2563eb;
+    }
+
+    .care-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <button id="careTrigger" class="care-trigger" type="button" title="Mantén presionado para abrir ajustes">
+      Ajustes (mantén)
+    </button>
+
+    <div class="header-space">
+      <span id="categoryBadge" class="category-badge">Toca el recuadro</span>
+    </div>
+
+    <div id="stage" class="stage" role="button" tabindex="0" aria-label="Tarjeta interactiva">
+      <div id="visualFrame" class="visual-frame">
+        <span id="fallbackEmoji" class="fallback-emoji">🌟</span>
+        <img id="itemImage" src="" alt="" style="display: none;" />
+      </div>
+      <div id="wordLabel" class="word-label">Ready?</div>
+      <div id="subLabel" class="sub-label">Toca para empezar</div>
+    </div>
+
+    <div class="praise-box">
+      <div id="praiseText" class="praise-text">Good Job, Dante!</div>
+    </div>
+  </div>
+
+  <!-- Panel discreto de ajustes para adultos -->
+  <div id="careModal" class="care-modal" aria-hidden="true">
+    <div class="care-card">
+      <h2>Ajustes de Dante World</h2>
+
+      <div class="care-row">
+        <label for="orderMode">Orden de tarjetas</label>
+        <select id="orderMode">
+          <option value="sequential">En orden</option>
+          <option value="random">Aleatorio</option>
+        </select>
+      </div>
+
+      <div class="care-row">
+        <label for="praiseDelay">Pausa Good Job: <strong id="delayValue">0.8s</strong></label>
+        <input id="praiseDelay" type="range" min="300" max="2000" step="100" value="800" />
+      </div>
+
+      <div class="care-actions">
+        <button id="testPraiseBtn" class="btn btn-secondary" type="button">Probar festejo</button>
+        <button id="closeCareBtn" class="btn btn-primary" type="button">Listo</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CONFIGURACIÓN DE TARJETAS
+    // Coloca tus fotos en: ./images/
+    // Coloca tus voces en: ./audio/
+    // Si un archivo aún no existe, el juego usa el emoji y una nota musical suave.
+    // =========================================================================
+    const ITEMS = [
+      {
+        id: 'mom',
+        category: 'Familia',
+        word: 'Mom',
+        hint: 'Mamá',
+        accent: '#ec4899',
+        emoji: '👩',
+        image: 'images/mom.jpg',
+        audio: 'audio/mom.mp3'
+      },
+      {
+        id: 'dad',
+        category: 'Familia',
+        word: 'Dad',
+        hint: 'Papá',
+        accent: '#2563eb',
+        emoji: '👨',
+        image: 'images/dad.jpg',
+        audio: 'audio/dad.mp3'
+      },
+      {
+        id: 'dante',
+        category: 'Familia',
+        word: 'Dante',
+        hint: 'Dante',
+        accent: '#16a34a',
+        emoji: '👦',
+        image: 'images/dante.jpg',
+        audio: 'audio/dante.mp3'
+      },
+      {
+        id: 'dog',
+        category: 'Mascotas',
+        word: 'Dog',
+        hint: 'Perrito',
+        accent: '#d97706',
+        emoji: '🐶',
+        image: 'images/dog.jpg',
+        audio: 'audio/dog.mp3'
+      },
+      {
+        id: 'ball',
+        category: 'Objetos',
+        word: 'Ball',
+        hint: 'Pelota',
+        accent: '#ea580c',
+        emoji: '⚽',
+        image: 'images/ball.jpg',
+        audio: 'audio/ball.mp3'
+      },
+      {
+        id: 'water',
+        category: 'Objetos',
+        word: 'Water',
+        hint: 'Agua',
+        accent: '#0284c7',
+        emoji: '💧',
+        image: 'images/water.jpg',
+        audio: 'audio/water.mp3'
+      }
+    ];
+
+    const GOOD_JOB_AUDIO = 'audio/goodjob.mp3';
+
+    let currentIndex = -1;
+    let praiseTimer = null;
+    let currentAudio = null;
+    let audioCtx = null;
+
+    const stage = document.getElementById('stage');
+    const categoryBadge = document.getElementById('categoryBadge');
+    const visualFrame = document.getElementById('visualFrame');
+    const itemImage = document.getElementById('itemImage');
+    const fallbackEmoji = document.getElementById('fallbackEmoji');
+    const wordLabel = document.getElementById('wordLabel');
+    const subLabel = document.getElementById('subLabel');
+    const praiseText = document.getElementById('praiseText');
+
+    const careTrigger = document.getElementById('careTrigger');
+    const careModal = document.getElementById('careModal');
+    const orderModeSelect = document.getElementById('orderMode');
+    const praiseDelayInput = document.getElementById('praiseDelay');
+    const delayValueLabel = document.getElementById('delayValue');
+    const testPraiseBtn = document.getElementById('testPraiseBtn');
+    const closeCareBtn = document.getElementById('closeCareBtn');
+
+    // Bloquear zoom por gesto de pellizco y doble toque en iOS/Android
+    document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300 && !e.target.closest('.care-modal')) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+
+    function ensureAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+
+    function playSoftTone(freq, duration = 0.18, type = 'sine', delay = 0) {
+      ensureAudioContext();
+      if (!audioCtx) return;
+
+      const startTime = audioCtx.currentTime + delay;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(0.11, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration + 0.02);
+    }
+
+    function playGentleChime() {
+      playSoftTone(523.25, 0.22, 'triangle', 0);     // Do5
+      playSoftTone(659.25, 0.28, 'triangle', 0.14);  // Mi5
+    }
+
+    // Intenta reproducir un archivo de audio; si no existe aún, ejecuta el respaldo suave
+    function playAudioOrFallback(src, fallbackFn, onEndedCallback) {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio.onended = null;
+        currentAudio.onerror = null;
+      }
+
+      if (!src) {
+        if (fallbackFn) fallbackFn();
+        if (onEndedCallback) setTimeout(onEndedCallback, 350);
+        return;
+      }
+
+      const audio = new Audio(src);
+      currentAudio = audio;
+
+      let handledFallback = false;
+      const triggerFallback = () => {
+        if (handledFallback) return;
+        handledFallback = true;
+        if (fallbackFn) fallbackFn();
+        if (onEndedCallback) setTimeout(onEndedCallback, 350);
+      };
+
+      audio.onerror = triggerFallback;
+      audio.onended = () => {
+        if (onEndedCallback) onEndedCallback();
+      };
+
+      audio.play().catch(triggerFallback);
+    }
+
+    function pickNextIndex() {
+      if (ITEMS.length === 1) return 0;
+
+      if (orderModeSelect.value === 'random') {
+        let next = Math.floor(Math.random() * ITEMS.length);
+        if (next === currentIndex) {
+          next = (next + 1) % ITEMS.length;
+        }
+        return next;
+      }
+
+      return (currentIndex + 1) % ITEMS.length;
+    }
+
+    function renderItem(item) {
+      categoryBadge.textContent = item.category;
+      wordLabel.textContent = item.word;
+      subLabel.textContent = item.hint;
+      stage.style.borderColor = item.accent;
+      visualFrame.style.background = `${item.accent}14`;
+
+      fallbackEmoji.textContent = item.emoji;
+      fallbackEmoji.style.display = 'block';
+      itemImage.style.display = 'none';
+
+      if (item.image) {
+        const probe = new Image();
+        probe.onload = () => {
+          itemImage.src = item.image;
+          itemImage.alt = item.word;
+          itemImage.style.display = 'block';
+          fallbackEmoji.style.display = 'none';
+        };
+        probe.onerror = () => {
+          itemImage.style.display = 'none';
+          fallbackEmoji.style.display = 'block';
+        };
+        probe.src = item.image;
+      }
+    }
+
+    function showGoodJob() {
+      praiseText.classList.remove('visible');
+      void praiseText.offsetWidth;
+      praiseText.classList.add('visible');
+
+      playAudioOrFallback(GOOD_JOB_AUDIO, playGentleChime);
+    }
+
+    function handleCardTap() {
+      if (careModal.classList.contains('open')) return;
+
+      clearTimeout(praiseTimer);
+      praiseText.classList.remove('visible');
+
+      currentIndex = pickNextIndex();
+      const item = ITEMS[currentIndex];
+      renderItem(item);
+
+      // Tono suave inicial al tocar
+      playSoftTone(440, 0.12, 'sine', 0);
+
+      // Reproduce la voz del objeto/persona y al terminar (o tras la pausa) dice Good Job, Dante!
+      const delayMs = Number(praiseDelayInput.value) || 800;
+
+      playAudioOrFallback(
+        item.audio,
+        () => playSoftTone(587.33, 0.18, 'triangle', 0.05),
+        () => {
+          praiseTimer = setTimeout(showGoodJob, delayMs);
+        }
+      );
+    }
+
+    stage.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      handleCardTap();
+    });
+
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleCardTap();
+      }
+    });
+
+    // Apertura segura del panel de ajustes (mantener presionado 1.2s)
+    let holdTimer = null;
+    const HOLD_MS = 1200;
+
+    function startHold(e) {
+      e.stopPropagation();
+      careTrigger.classList.add('holding');
+      holdTimer = setTimeout(() => {
+        careTrigger.classList.remove('holding');
+        careModal.classList.add('open');
+        careModal.setAttribute('aria-hidden', 'false');
+      }, HOLD_MS);
+    }
+
+    function cancelHold(e) {
+      if (e) e.stopPropagation();
+      clearTimeout(holdTimer);
+      careTrigger.classList.remove('holding');
+    }
+
+    careTrigger.addEventListener('pointerdown', startHold);
+    careTrigger.addEventListener('pointerup', cancelHold);
+    careTrigger.addEventListener('pointerleave', cancelHold);
+    careTrigger.addEventListener('pointercancel', cancelHold);
+
+    praiseDelayInput.addEventListener('input', () => {
+      const sec = (Number(praiseDelayInput.value) / 1000).toFixed(1);
+      delayValueLabel.textContent = `${sec}s`;
+    });
+
+    testPraiseBtn.addEventListener('click', () => {
+      careModal.classList.remove('open');
+      careModal.setAttribute('aria-hidden', 'true');
+      showGoodJob();
+    });
+
+    closeCareBtn.addEventListener('click', () => {
+      careModal.classList.remove('open');
+      careModal.setAttribute('aria-hidden', 'true');
+    });
+  </script>
+</body>
+</html>
