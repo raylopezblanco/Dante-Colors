@@ -1,0 +1,22 @@
+{
+  "name": "Dante-Colors",
+  "short_name": "Dante-Colors",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef7ff",
+  "theme_color": "#dceeff",
+  "icons": [
+    {
+      "src": "capybara.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "capybara.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
