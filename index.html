@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dante World</title>
+  <title>Dante-Colors</title>
   <style>
     * {
       box-sizing: border-box;
@@ -252,7 +252,7 @@
     </button>
 
     <div class="header-space">
-      <span id="categoryBadge" class="category-badge">Toca el recuadro</span>
+      <span id="categoryBadge" class="category-badge">Dante-Colors</span>
     </div>
 
     <div id="stage" class="stage" role="button" tabindex="0" aria-label="Tarjeta interactiva">
@@ -272,7 +272,7 @@
   <!-- Panel discreto de ajustes para adultos -->
   <div id="careModal" class="care-modal" aria-hidden="true">
     <div class="care-card">
-      <h2>Ajustes de Dante World</h2>
+      <h2>Ajustes de Dante-Colors</h2>
 
       <div class="care-row">
         <label for="orderMode">Orden de tarjetas</label>
@@ -296,9 +296,8 @@
 
   <script>
     // =========================================================================
-    // CONFIGURACIÓN DE TARJETAS
-    // Coloca tus fotos en: ./images/
-    // Coloca tus voces en: ./audio/
+    // CONFIGURACIÓN DE TARJETAS (ARCHIVOS DIRECTOS EN LA RAÍZ DE Dante-Colors)
+    // Sube tus fotos y audios al mismo nivel que index.html (ej. mom.jpg, mom.mp3).
     // Si un archivo aún no existe, el juego usa el emoji y una nota musical suave.
     // =========================================================================
     const ITEMS = [
@@ -309,8 +308,8 @@
         hint: 'Mamá',
         accent: '#ec4899',
         emoji: '👩',
-        image: 'images/mom.jpg',
-        audio: 'audio/mom.mp3'
+        image: 'mom.jpg',
+        audio: 'mom.mp3'
       },
       {
         id: 'dad',
@@ -319,8 +318,8 @@
         hint: 'Papá',
         accent: '#2563eb',
         emoji: '👨',
-        image: 'images/dad.jpg',
-        audio: 'audio/dad.mp3'
+        image: 'dad.jpg',
+        audio: 'dad.mp3'
       },
       {
         id: 'dante',
@@ -329,8 +328,8 @@
         hint: 'Dante',
         accent: '#16a34a',
         emoji: '👦',
-        image: 'images/dante.jpg',
-        audio: 'audio/dante.mp3'
+        image: 'dante.jpg',
+        audio: 'dante.mp3'
       },
       {
         id: 'dog',
@@ -339,8 +338,8 @@
         hint: 'Perrito',
         accent: '#d97706',
         emoji: '🐶',
-        image: 'images/dog.jpg',
-        audio: 'audio/dog.mp3'
+        image: 'dog.jpg',
+        audio: 'dog.mp3'
       },
       {
         id: 'ball',
@@ -349,8 +348,8 @@
         hint: 'Pelota',
         accent: '#ea580c',
         emoji: '⚽',
-        image: 'images/ball.jpg',
-        audio: 'audio/ball.mp3'
+        image: 'ball.jpg',
+        audio: 'ball.mp3'
       },
       {
         id: 'water',
@@ -359,12 +358,12 @@
         hint: 'Agua',
         accent: '#0284c7',
         emoji: '💧',
-        image: 'images/water.jpg',
-        audio: 'audio/water.mp3'
+        image: 'water.jpg',
+        audio: 'water.mp3'
       }
     ];
 
-    const GOOD_JOB_AUDIO = 'audio/goodjob.mp3';
+    const GOOD_JOB_AUDIO = 'goodjob.mp3';
 
     let currentIndex = -1;
     let praiseTimer = null;
@@ -438,7 +437,7 @@
       playSoftTone(659.25, 0.28, 'triangle', 0.14);  // Mi5
     }
 
-    // Intenta reproducir un archivo de audio; si no existe aún, ejecuta el respaldo suave
+    // Intenta reproducir un archivo de audio en la raíz; si no existe aún, ejecuta el respaldo suave
     function playAudioOrFallback(src, fallbackFn, onEndedCallback) {
       if (currentAudio) {
         currentAudio.pause();
