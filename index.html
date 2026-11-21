@@ -23,6 +23,32 @@
       background: linear-gradient(160deg, #eef7ff 0%, #fff6e8 100%);
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       color: #1e293b;
+      position: relative;
+    }
+
+    /* Capa de fondo con capibara suave (no bloquea toques) */
+    .bg-capybara {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 18px;
+      opacity: 0.16;
+    }
+
+    .bg-capybara img {
+      width: min(320px, 72vw);
+      height: auto;
+      object-fit: contain;
+      filter: saturate(0.85);
+    }
+
+    .bg-capybara-fallback {
+      font-size: clamp(6rem, 22vw, 9.5rem);
+      line-height: 1;
     }
 
     .app {
@@ -34,6 +60,7 @@
       justify-content: space-between;
       padding: 20px 18px 26px;
       position: relative;
+      z-index: 1;
     }
 
     /* Botón discreto de cuidado (requiere mantener presionado) */
@@ -42,7 +69,7 @@
       top: 12px;
       right: 12px;
       z-index: 20;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.78);
       border: 1px solid rgba(15, 23, 42, 0.12);
       color: #475569;
       font-size: 0.78rem;
@@ -73,7 +100,7 @@
       text-transform: uppercase;
       padding: 5px 14px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       color: #334155;
       box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
     }
@@ -85,7 +112,7 @@
       flex: 1;
       max-height: 520px;
       margin: 10px 0;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.96);
       border-radius: 36px;
       border: 6px solid #ffffff;
       box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
@@ -246,6 +273,12 @@
   </style>
 </head>
 <body>
+  <!-- Fondo de capibara: capybara.jpg en la raíz -->
+  <div id="bgCapybara" class="bg-capybara" aria-hidden="true">
+    <span id="bgCapybaraFallback" class="bg-capybara-fallback">🦫</span>
+    <img id="bgCapybaraImg" src="" alt="" style="display: none;" />
+  </div>
+
   <div class="app">
     <button id="careTrigger" class="care-trigger" type="button" title="Mantén presionado para abrir ajustes">
       Ajustes (mantén)
@@ -295,11 +328,8 @@
   </div>
 
   <script>
-    // =========================================================================
-    // CONFIGURACIÓN DE TARJETAS (ARCHIVOS DIRECTOS EN LA RAÍZ DE Dante-Colors)
-    // Sube tus fotos y audios al mismo nivel que index.html (ej. mom.jpg, mom.mp3).
-    // Si un archivo aún no existe, el juego usa el emoji y una nota musical suave.
-    // =========================================================================
+    const CAPYBARA_BG_IMAGE = 'capybara.jpg';
+
     const ITEMS = [
       {
         id: 'mom',
@@ -370,6 +400,9 @@
     let currentAudio = null;
     let audioCtx = null;
 
+    const bgCapybaraImg = document.getElementById('bgCapybaraImg');
+    const bgCapybaraFallback = document.getElementById('bgCapybaraFallback');
+
     const stage = document.getElementById('stage');
     const categoryBadge = document.getElementById('categoryBadge');
     const visualFrame = document.getElementById('visualFrame');
@@ -387,7 +420,20 @@
     const testPraiseBtn = document.getElementById('testPraiseBtn');
     const closeCareBtn = document.getElementById('closeCareBtn');
 
-    // Bloquear zoom por gesto de pellizco y doble toque en iOS/Android
+    if (CAPYBARA_BG_IMAGE) {
+      const capyProbe = new Image();
+      capyProbe.onload = () => {
+        bgCapybaraImg.src = CAPYBARA_BG_IMAGE;
+        bgCapybaraImg.style.display = 'block';
+        bgCapybaraFallback.style.display = 'none';
+      };
+      capyProbe.onerror = () => {
+        bgCapybaraImg.style.display = 'none';
+        bgCapybaraFallback.style.display = 'block';
+      };
+      capyProbe.src = CAPYBARA_BG_IMAGE;
+    }
+
     document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
     let lastTouchEnd = 0;
     document.addEventListener('touchend', (e) => {
@@ -433,11 +479,10 @@
     }
 
     function playGentleChime() {
-      playSoftTone(523.25, 0.22, 'triangle', 0);     // Do5
-      playSoftTone(659.25, 0.28, 'triangle', 0.14);  // Mi5
+      playSoftTone(523.25, 0.22, 'triangle', 0);
+      playSoftTone(659.25, 0.28, 'triangle', 0.14);
     }
 
-    // Intenta reproducir un archivo de audio en la raíz; si no existe aún, ejecuta el respaldo suave
     function playAudioOrFallback(src, fallbackFn, onEndedCallback) {
       if (currentAudio) {
         currentAudio.pause();
@@ -530,10 +575,8 @@
       const item = ITEMS[currentIndex];
       renderItem(item);
 
-      // Tono suave inicial al tocar
       playSoftTone(440, 0.12, 'sine', 0);
 
-      // Reproduce la voz del objeto/persona y al terminar (o tras la pausa) dice Good Job, Dante!
       const delayMs = Number(praiseDelayInput.value) || 800;
 
       playAudioOrFallback(
@@ -557,7 +600,6 @@
       }
     });
 
-    // Apertura segura del panel de ajustes (mantener presionado 1.2s)
     let holdTimer = null;
     const HOLD_MS = 1200;
 
